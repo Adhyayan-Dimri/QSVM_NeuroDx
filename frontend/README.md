@@ -1,70 +1,169 @@
-# Getting Started with Create React App
+# `/app/frontend/README.md`
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+```markdown
+# QSVM NeuroDx — Frontend
 
-## Available Scripts
+React 19 dashboard for the QSVM Brain Tumor Detection backend.
+Three routes: Diagnosis (upload + analyze), Model Insights (metrics),
+History (past scans + PDF/DICOM export).
 
-In the project directory, you can run:
+## Stack
 
-### `npm start`
+| | |
+|---|---|
+| Framework | React 19 + react-router-dom |
+| Build | react-scripts 5 + CRACO (path alias `@/*`) |
+| Styling | Tailwind CSS, shadcn/ui primitives |
+| Icons | lucide-react |
+| HTTP | axios |
+| Toasts | sonner |
+| Fonts | Manrope (headings) · IBM Plex Sans (body) · JetBrains Mono (data) |
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Prerequisites
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Node.js 18+ (LTS)
+- Yarn 1.22+ (`npm install -g yarn`)
+- Running backend at `REACT_APP_BACKEND_URL`
 
-### `npm test`
+## Setup
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+cd frontend
+yarn install
+```
 
-### `npm run build`
+Create `frontend/.env`:
+```
+REACT_APP_BACKEND_URL=http://localhost:8001
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+> Use the **full external URL** when deployed (e.g.
+> `https://qsvm.example.com`). Never hardcode `http://localhost`.
+> All API calls go through `src/lib/api.js`, which prefixes
+> `${REACT_APP_BACKEND_URL}/api`.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Required patch — react-scripts ↔ webpack-dev-server 5
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+`react-scripts 5.0.1` ships an outdated dev-server config. Patch
+`node_modules/react-scripts/config/webpackDevServer.config.js`:
 
-### `npm run eject`
+1. Replace `https: getHttpsConfig(),` with
+   `server: getHttpsConfig() ? { type: 'https', options: getHttpsConfig() === true ? undefined : getHttpsConfig() } : 'http',`
+2. Replace `onBeforeSetupMiddleware` + `onAfterSetupMiddleware` blocks
+   with a single `setupMiddlewares(middlewares, devServer)` that calls
+   `evalSourceMapMiddleware`, optional `paths.proxySetup`,
+   `redirectServedPath`, `noopServiceWorkerMiddleware`, and returns
+   `middlewares`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Persist via `patch-package`:
+```bash
+yarn add -D patch-package
+npx patch-package react-scripts
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Run
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+yarn start            # dev server on http://localhost:3000
+yarn build           
+yarn test            
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Project layout
 
-## Learn More
+```
+src/
+├── App.js                          # router + Toaster
+├── index.css                       # Tailwind layers + theme tokens + animations
+├── lib/
+│   ├── api.js                      # axios client, runPrediction(file), downloadReport(id), downloadDicom(id)
+│   └── quantum.js                  # CLASSES, CLASS_COLORS, STAGES, formatTime, confidenceColor
+├── pages/
+│   ├── DashboardPage.jsx           # upload + submit + poll + results
+│   ├── InsightsPage.jsx            # /api/metrics renderer
+│   └── HistoryPage.jsx             # table with filters + PDF/DICOM/delete
+└── components/
+    ├── Layout.jsx                  # nav header + footer
+    ├── UploadZone.jsx              # drag-drop + preview
+    ├── ProcessingOverlay.jsx       # quantum circuit SVG + server-driven stages
+    ├── ResultsPanel.jsx            # diagnosis headline + PDF/DICOM buttons
+    ├── ConfidenceGauge.jsx         # animated SVG ring
+    ├── ProbabilityChart.jsx        # horizontal bars across 4 classes
+    ├── ConfusionMatrix.jsx         # heatmap table
+    └── ui/                         # shadcn primitives 
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Data flow
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+DashboardPage.handleAnalyze()
+  └─ runPrediction(file, onProgress)              [src/lib/api.js]
+        ├─ POST /api/predict  →  {job_id, estimated_time_seconds}
+        └─ loop: GET /api/predict/status/{job_id} every 600ms
+              ├─ onProgress({status, stage_idx, elapsed_seconds, ...})
+              │     → ProcessingOverlay reads serverStage / serverElapsed
+              ├─ status === "done"  → resolve with result
+              └─ status === "error" → throw
+```
 
-### Code Splitting
+`ProcessingOverlay` falls back to a client-side timer if `serverStage`
+/ `serverElapsed` are absent (mock mode without polling).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Theming
 
-### Analyzing the Bundle Size
+Theme tokens live in `src/index.css`:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+| Token | Value | Use |
+|---|---|---|
+| `--bg-main` | `#060913` | page background |
+| `--bg-card` | `#0D1326` | primary card |
+| `--bg-elevated` | `#131A33` | nested card |
+| `--brand-primary` | `#8B5CF6` | violet — primary actions, predicted class |
+| `--brand-accent` | `#2DD4BF` | teal — accents, "No Tumor" class |
+| `--semantic-warning` | `#F97316` | low-confidence + Meningioma class |
+| `--semantic-danger` | `#EF4444` | Glioma class |
 
-### Making a Progressive Web App
+Per-class colors come from `CLASS_COLORS` in `src/lib/quantum.js` — keep
+in sync with backend if you add new classes.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Routing & test IDs
 
-### Advanced Configuration
+| Route | data-testid roots |
+|---|---|
+| `/`          | `dashboard-page`, `upload-dropzone`, `analyze-button`, `processing-overlay`, `results-panel` |
+| `/insights`  | `insights-page`, `confusion-matrix`, `kernel-separation` |
+| `/history`   | `history-page`, `filter-{class}`, `history-row-{id}`, `download-report-{id}`, `download-dicom-{id}`, `delete-{id}` |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Every interactive element and key info node carries a `data-testid`. 
 
-### Deployment
+## Common issues
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+| Symptom | Fix |
+|---|---|
+| Blank page, console: `process.env.REACT_APP_BACKEND_URL is undefined` | `.env` not loaded — restart `yarn start` after editing |
+| CORS error in console | Add your frontend origin to `CORS_ORIGINS` in `backend/.env` |
+| Stages don't tick | Backend polling endpoint returning 404 — check `job_id` propagation; falls back to client timer automatically |
+| `yarn start` fails with `onAfterSetupMiddleware` error | Apply the react-scripts patch above |
+| Build warnings about `cmdk-input-wrapper` and shadcn calendar | Pre-existing shadcn lint noise; safe to ignore |
 
-### `npm run build` fails to minify
+## Production build
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+yarn build
+```
+
+Outputs static assets to `build/`. Serve behind any reverse proxy (nginx,
+Cloudflare Pages, Vercel static, S3+CloudFront). Set
+`REACT_APP_BACKEND_URL` at **build time** — CRA inlines env vars, they
+are not read at runtime.
+
+Example nginx:
+```nginx
+location / {
+    try_files $uri /index.html;
+    root /var/www/qsvm-frontend/build;
+}
+location /api/ {
+    proxy_pass http://localhost:8001;
+}
+```
