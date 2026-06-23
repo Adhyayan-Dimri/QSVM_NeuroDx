@@ -1,6 +1,5 @@
 
-```markdown
-# `QSVM NeuroDx — Frontend`
+# QSVM NeuroDx — Frontend
 
 React 19 dashboard for the QSVM Brain Tumor Detection backend.
 Three routes: Diagnosis (upload + analyze), Model Insights (metrics),
