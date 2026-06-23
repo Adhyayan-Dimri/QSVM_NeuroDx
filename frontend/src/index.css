@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --bg-main: #060913;
+    --bg-card: #0D1326;
+    --bg-elevated: #131A33;
+    --border-subtle: #1E293B;
+    --border-strong: #2A3754;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-disabled: #475569;
+    --brand-primary: #8B5CF6;
+    --brand-primary-hover: #A78BFA;
+    --brand-accent: #2DD4BF;
+    --semantic-success: #10B981;
+    --semantic-warning: #F97316;
+    --semantic-danger: #EF4444;
+}
+
+html, body, #root {
+    background: var(--bg-main);
+    color: var(--text-primary);
+    min-height: 100vh;
+}
+
+body {
+    margin: 0;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(139, 92, 246, 0.12), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(45, 212, 191, 0.08), transparent 60%),
+        var(--bg-main);
+    background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Manrope', sans-serif;
+    letter-spacing: -0.02em;
+}
+
+code, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+    :root {
+        --background: 224 47% 5%;
+        --foreground: 210 40% 98%;
+        --card: 226 41% 10%;
+        --card-foreground: 210 40% 98%;
+        --popover: 226 41% 10%;
+        --popover-foreground: 210 40% 98%;
+        --primary: 258 90% 66%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 217 33% 17%;
+        --secondary-foreground: 210 40% 98%;
+        --muted: 217 33% 17%;
+        --muted-foreground: 215 20% 65%;
+        --accent: 173 80% 50%;
+        --accent-foreground: 222 47% 4%;
+        --destructive: 0 72% 51%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 215 28% 17%;
+        --input: 215 28% 17%;
+        --ring: 258 90% 66%;
+        --chart-1: 258 90% 66%;
+        --chart-2: 173 80% 50%;
+        --chart-3: 24 95% 53%;
+        --chart-4: 142 71% 45%;
+        --chart-5: 199 89% 48%;
+        --radius: 0.5rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+}
+
+/* Quantum pulse circuit animation */
+@keyframes qPulse {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+}
+
+@keyframes qFlow {
+    0% { stroke-dashoffset: 100; }
+    100% { stroke-dashoffset: 0; }
+}
+
+@keyframes qSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes qFadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes qBarFill {
+    from { width: 0; }
+}
+
+.q-fade-up {
+    animation: qFadeUp 0.45s ease-out both;
+}
+
+.q-stage-active .q-stage-dot {
+    animation: qPulse 1.2s ease-in-out infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #3B4A75; }
+
+/* Selection */
+::selection {
+    background: rgba(139, 92, 246, 0.4);
+    color: #fff;
+}
+
+/* Data label utility */
+.data-label {
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+/* Card */
+.q-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+}
+
+.q-card-elevated {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+}

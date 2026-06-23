@@ -1,0 +1,9 @@
+Looking in indexes: https://pypi.org/simple, https://d33sy5i8bnduwe.cloudfront.net/simple/
+Collecting reportlab
+  Downloading reportlab-5.0.0-py3-none-any.whl.metadata (1.6 kB)
+Requirement already satisfied: pillow>=9.0.0 in /root/.venv/lib/python3.11/site-packages (from reportlab) (12.2.0)
+Requirement already satisfied: charset-normalizer in /root/.venv/lib/python3.11/site-packages (from reportlab) (3.4.7)
+Downloading reportlab-5.0.0-py3-none-any.whl (2.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 9.3 MB/s  0:00:00
+Installing collected packages: reportlab
+Successfully installed reportlab-5.0.0

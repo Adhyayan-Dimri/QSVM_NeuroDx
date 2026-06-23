@@ -1,0 +1,83 @@
+{
+  "theme": {
+    "archetype": "5",
+    "archetype_name": "Luxury & High-Tech Medical (Quantum Variant)",
+    "mode": "dark"
+  },
+  "colors": {
+    "background": {
+      "main": "#060913",
+      "card": "#0D1326",
+      "overlay": "rgba(0, 0, 0, 0.7)"
+    },
+    "text": {
+      "primary": "#F8FAFC",
+      "secondary": "#94A3B8",
+      "disabled": "#475569"
+    },
+    "brand": {
+      "primary": "#8B5CF6",
+      "primary_hover": "#A78BFA",
+      "accent": "#2DD4BF"
+    },
+    "semantic": {
+      "success": "#10B981",
+      "warning": "#F97316",
+      "danger": "#EF4444",
+      "border": "#1E293B"
+    }
+  },
+  "typography": {
+    "font_family": {
+      "heading": "Manrope, sans-serif",
+      "body": "IBM Plex Sans, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "rules": {
+      "headings": "Tight tracking (tracking-tight), never center-aligned for dashboards, high contrast.",
+      "body": "Left-aligned, standard leading.",
+      "data_labels": "Uppercase, mono-spaced, tracking-[0.1em], tiny (text-xs). Use for status badges and chart axis."
+    }
+  },
+  "layout": {
+    "strategy": "The 'Control Room' Grid",
+    "spacing_scale": "Dense and compact spacing (gap-4, p-4, p-6). Every pixel utilized.",
+    "container": "Max-w-7xl mx-auto, px-4 sm:px-6 lg:px-8",
+    "card_style": "Flat Solid Surfaces. Subtle border (border-slate-800). Max 8px border-radius. No heavy shadows, use inner 1px border highlights to ground elements."
+  },
+  "components": {
+    "upload_zone": "Dashed border (border-slate-700), bg-slate-900/50, hover:bg-slate-900. Smooth transitions. Use a strong clinical icon.",
+    "processing_overlay": "Quantum-themed overlay. Use monospaced terminal font (JetBrains Mono) for staging labels. Pulsing teal/violet SVG circuit lines. Absolute positioned over the image preview.",
+    "bar_chart": "Horizontal orientation. Minimal axis lines. Highlight the predicted class with brand.primary. Unselected classes in muted slate.",
+    "gauge_meter": "Circular SVG gauge for confidence. Stroke color dynamically changes: Green > 90%, Teal 75-90%, Violet 60-75%, Orange < 60%.",
+    "warning_badge": "Triggers if confidence < 60%. Style: bg-orange-950, text-orange-400, border-orange-900, uppercase mono-spaced.",
+    "history_table": "Dense Shadcn table. Hover states on rows (hover:bg-slate-800/50). Small 40x40px rounded thumbnails for past MRI scans."
+  },
+  "motion": {
+    "hover": "Subtle translation (-translate-y-[1px]) for action buttons, fast opacity transitions.",
+    "loading": "Pulse animations on the circuit diagram. Staggered text reveal for processing stages (Extracting -> Encoding -> Computing -> Aggregating).",
+    "charts": "Animate width/stroke-dasharray over 1-2 seconds on load to simulate computation completion."
+  },
+  "assets": {
+    "icons": "lucide-react (default for standard UI) or @phosphor-icons/react for clinical precision.",
+    "images": {
+      "mri_thumbnail_1": "https://images.pexels.com/photos/5723883/pexels-photo-5723883.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "mri_thumbnail_2": "https://images.pexels.com/photos/7089020/pexels-photo-7089020.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "lab_background": "https://images.pexels.com/photos/5827325/pexels-photo-5827325.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure minimum 4.5:1 for text. Avoid pure black backgrounds to prevent eye strain during long clinical shifts.",
+    "data_testid": "ALL interactive and key informational elements MUST include a data-testid attribute in kebab-case (e.g., data-testid='upload-analyze-button')."
+  },
+  "instructions_to_main_agent": [
+    "Use React (.js/.jsx) as requested. Do NOT use TypeScript (.tsx) files.",
+    "Use Shadcn UI extensively but heavily override default styles to match the dark midnight-navy theme and 'Control Room' flat-solid aesthetics.",
+    "Do NOT use the 'Inter' font anywhere. Configure Tailwind to use Manrope for sans, IBM Plex Sans for body, and JetBrains Mono for mono.",
+    "Implement the Processing State as an engaging, mono-spaced terminal output + pulsing circuit, mimicking a real QSVM execution timeline. Include a timer counting up.",
+    "Use Recharts for the Probability Distribution bar chart and Model Insights charts. Keep chart grids minimal (border-slate-800).",
+    "For the History Log, map the provided MRI thumbnails.",
+    "Apply `data-testid` to all buttons, upload zones, chart containers, confidence meters, and warning badges.",
+    "Ensure 'Low confidence — radiologist review recommended' badge appears conditionally when prediction confidence is below 60%."
+  ]
+}

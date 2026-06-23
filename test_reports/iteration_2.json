@@ -1,0 +1,31 @@
+{
+  "summary": "Iteration 2 testing of QSVM dashboard new features (PDF report endpoint, USE_REAL_MODEL env switch, 404-on-unknown-delete). Backend pytest: 10/10 passed including new tests for root.mode='mock', /api/history/{id}/report.pdf (200, content-type application/pdf, >=1KB body, Content-Disposition contains 'attachment' + scan_id prefix), report.pdf 404 on unknown id, delete 404 on unknown id, and a second PDF generation path. Frontend Playwright: upload -> analyze -> processing overlay persists ~8s -> results panel with diagnosis/confidence/probabilities. New 'PDF report' button (data-testid=download-report-button) appears alongside (not replacing) low-confidence-warning/high-confidence-badge in the headline. Clicking triggers a real PDF download (qsvm-report-{id8}.pdf) and shows toast 'Report downloaded'. History page: per-row download-report-{id} button renders next to delete-{id} button and triggers PDF download. Model Insights and navigation continue to work.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/history/{id}/report.pdf", "issue": "Returns 500 (uncaught reportlab OSError) when the stored thumbnail_url contains a truncated/corrupt JPEG. Reproduced with a 1x1 malformed JPEG accepted by /api/predict; PDF endpoint then fails with 'image file is truncated'. Recommendation: wrap c.drawImage in try/except inside pdf_report.build_report and skip the image (or convert via PIL with ImageFile.LOAD_TRUNCATED_IMAGES=True) so report generation degrades gracefully. Real MRIs from the UI are unaffected."}
+    ]
+  },
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_qsvm_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(minor) Harden /api/history/{id}/report.pdf against corrupt thumbnails: wrap drawImage in try/except in pdf_report.py so a bad embedded base64 image returns a PDF without the image instead of HTTP 500."
+  ],
+  "critical_code_review_comments": [
+    "pdf_report.build_report directly calls c.drawImage on user-uploaded bytes with no try/except — single point of 500s if the stored thumbnail is truncated (see minor bug above). _image_from_data_url already swallows decode errors but ImageReader returns successfully for truncated JPEGs and fails later inside reportlab.",
+    "server.py still uses deprecated @app.on_event('shutdown') — prefer FastAPI lifespan handler.",
+    "Mongo thumbnail_url is full-size base64 (no resize) — fine for tested sizes, but PDF embeds a 70mm box so a server-side downscale (e.g. 512px) would shrink both storage and PDF size.",
+    "USE_REAL_MODEL real path is correctly env-gated and falls back to mock on FileNotFoundError/Exception — verified by code review; not exercised at runtime since artifacts intentionally absent."
+  ],
+  "updated_files": ["/app/backend/tests/test_qsvm_api.py"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "N/A (no auth)",
+  "seed_data_creation": "pytest creates and deletes its own scans. Three frontend-uploaded scans remain in history at test end (used to verify history per-row PDF download).",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend mock predict sleeps 4.5-10s; use timeout>=30s. PDF endpoint: Content-Disposition uses 'attachment; filename=qsvm-report-{id8}.pdf' (8-char prefix). Toast id is 'Report downloaded' (success) / 'Could not generate report' (error). History page download buttons: data-testid='download-report-{full_uuid}'. Mode in /api/ root is 'mock' until USE_REAL_MODEL=true is set in backend/.env (artifacts not present anyway).",
+  "rca of the issue": "PDF 500 RCA: pdf_report.py line 72 c.drawImage(img, ...) raises OSError('image file is truncated') when the underlying JPEG (decoded from data:image/jpeg;base64,... in scan.thumbnail_url) is corrupt/truncated. _image_from_data_url only catches decode errors at base64/PIL-open stage, not during reportlab's later RGB extraction. Mitigation: try/except around drawImage; on failure draw an empty placeholder rect (already drawn just before). Optional hardening: set PIL.ImageFile.LOAD_TRUNCATED_IMAGES = True at module import."
+}
