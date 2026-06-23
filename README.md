@@ -236,6 +236,6 @@ curl http://localhost:8001/api/
 
 ## Disclaimer
 
-This is a research preview. Quantum kernels remain an open research area; do
-not use this system for clinical decisions. Always defer to a qualified
+This is a research preview. Quantum kernels remain an open research area, do
+not use this system for clinical decisions. Always refer to a qualified
 radiologist.
