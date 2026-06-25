@@ -65,8 +65,8 @@ backend/models/
 | Kernel layers | 2 | Hadamard + RZ + entangling RZ |
 | LDA dims | 1 | one-vs-rest discriminant axis |
 | PCA dims | 5 | combined with LDA → 6 features → 6 qubits |
-| Images per class | 150 (train), 120 (val/test) | configurable in `train_qsvm.py` |
-| Fine-tune epochs | 8 | with `EarlyStopping(patience=3)` |
+| Images per class | 500 (train), 425 (val/test) | configurable in `train_qsvm.py` |
+| Fine-tune epochs | 15 | with `EarlyStopping(patience=3)` |
 | Temperature | 0.3 | softmax softening for final 4-class fusion |
 | Neighbors (kNN) | 7 | weighted by kernel similarity |
 

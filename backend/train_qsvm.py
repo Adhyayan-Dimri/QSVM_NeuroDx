@@ -36,8 +36,8 @@ TOTAL_QUBITS = 6
 NUM_LAYERS = 2
 LDA_DIMS = 1
 PCA_DIMS = 5
-IMG_PER_CLASS = 150
-FINETUNE_EPOCHS = 8
+IMG_PER_CLASS = 500
+FINETUNE_EPOCHS = 15
 NUM_NEIGHBORS = 7
 RAND_SEED = 42
 LABEL_MAP = {"notumor": 0, "pituitary": 1, "meningioma": 2, "glioma": 3}
@@ -212,7 +212,6 @@ def train_binary(cls: int, Xtr, ytr) -> BinaryModelState:
     Xt, yb = prep.fit_transform(Xtr, ytr)
     K = build_matrix(Xt, Xt, label=CLASS_NAMES[cls])
 
-    # Direction check
     idx = np.random.choice(len(yb), min(40, len(yb)), replace=False)
     same, diff = [], []
     for _ in range(300):
@@ -261,7 +260,7 @@ def main():
 
     X, y = extract_features(extractor, training_dir)
     Xtr, Xval, ytr, yval = train_test_split(
-        X, y, test_size=0.2, stratify=y, random_state=RAND_SEED
+        X, y, test_size=0.15, stratify=y, random_state=RAND_SEED
     )
 
     print("[3/3] Training 4 quantum-kernel OvR classifiers ...")
